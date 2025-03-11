@@ -136,7 +136,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📬 Contact
 
-If you have any questions or feedback, please reach out at [your-email@example.com](mailto:your-email@example.com)
+no
 
 ---
 
