@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import { 
   Box, 
   Grid, 
@@ -14,7 +13,8 @@ import {
   DialogActions,
   useTheme,
   Snackbar,
-  Alert
+  Alert,
+  Tooltip
 } from '@mui/material'
 import {
   Add,
@@ -22,12 +22,14 @@ import {
   RestaurantMenu,
   DragHandle,
   Info,
-  CalendarToday
+  CalendarToday,
+  Share
 } from '@mui/icons-material'
 import { searchRecipes, getRecipeDetails } from '../services/spoonacular'
 import NutritionProgress from '../components/NutritionProgress'
 import RecipeModal from '../components/RecipeModal'
 import { useNavigate } from 'react-router-dom'
+import { shareMealPlan } from '../services/shareService'
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snacks']
@@ -53,6 +55,18 @@ export default function MealPlanner() {
   const [error, setError] = useState(null)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
+
+  const handleShareMealPlan = async () => {
+    try {
+      const shareId = await shareMealPlan(plans)
+      const shareUrl = `${window.location.origin}/shared/${shareId}`
+      navigator.clipboard.writeText(shareUrl)
+      setSnackbarMessage('Share link copied to clipboard!')
+      setSnackbarOpen(true)
+    } catch (error) {
+      setError('Failed to share meal plan. Please try again.')
+    }
+  }
 
   // Calculate nutrition whenever plans change
   useEffect(() => {
@@ -157,7 +171,16 @@ export default function MealPlanner() {
           carbs={nutritionSummary.carbs}
           fat={nutritionSummary.fat}
         />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+          <Tooltip title="Share your meal plan with others">
+            <Button
+              variant="outlined"
+              startIcon={<Share />}
+              onClick={handleShareMealPlan}
+            >
+              Share
+            </Button>
+          </Tooltip>
           <Button
             variant="outlined"
             startIcon={<CalendarToday />}
